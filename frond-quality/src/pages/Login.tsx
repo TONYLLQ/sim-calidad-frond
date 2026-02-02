@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import LoginForm from "../components/forms/LoginForm";
+import LoginForm from "../components/forms/form.login";
 import type { JSX } from "@emotion/react/jsx-runtime";
 
 export default function LoginPage(): JSX.Element {

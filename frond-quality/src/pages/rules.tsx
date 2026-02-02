@@ -4,7 +4,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 
-import DataTableLocal, { type ColumnDef } from "../components/tables/Table";
+import DataTableLocal, { type ColumnDef } from "../components/tables/table.tables";
 import { getRules, type rule } from "../api/rules";
 
 type ApiError = { detail?: string; message?: string };
