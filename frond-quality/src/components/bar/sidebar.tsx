@@ -27,6 +27,7 @@ import BoltIcon from "@mui/icons-material/Bolt";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
+
 import {
   styles,
   DRAWER_WIDTH,
@@ -44,7 +45,7 @@ const MAIN_ITEMS: SidebarItem[] = [
   { label: "Dashboard", icon: <DashboardIcon />, to: "/dashboard" },
   { label: "Analytics", icon: <BarChartIcon />, to: "/analytics" },
   { label: "Users", icon: <PeopleIcon />, to: "/users", badge: 12 },
-  { label: "Reports", icon: <DescriptionIcon />, to: "/reports" },
+  { label: "Reports", icon: <DescriptionIcon />, to: "/rules" },
   { label: "Notifications", icon: <NotificationsIcon />, to: "/notifications", badge: 3 },
 ];
 
@@ -117,7 +118,7 @@ export default function Sidebar({ collapsed, onToggle, onLogout, user }: Props) 
 
           {!collapsed && (
             <Typography fontWeight={900} letterSpacing={0.2}>
-              Dashboard
+              CALIDA DE DATOS
             </Typography>
           )}
         </Stack>

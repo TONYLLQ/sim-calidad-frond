@@ -11,6 +11,6 @@ export type User = {
 };
 
 export async function getUsersApi() {
-  const { data } = await http.get<User[]>("api/auth/token/users/");
+  const { data } = await http.get<User[]>("api/auth/token/users/me/");
   return data;
 }
