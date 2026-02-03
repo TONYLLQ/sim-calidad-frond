@@ -7,7 +7,12 @@ export const loginSx = {
     display: "grid",
     placeItems: "center",
     p: 2,
-    background: "linear-gradient(135deg, #0c3b75, #0e4a8a)",
+    //background: "linear-gradient(135deg, #0c3b75, #0e4a8a)",
+    backgroundColor: "#0f172a",
+    backgroundImage: `
+    radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(236, 72, 153, 0.15) 0%, transparent 40%)
+  `
   } satisfies SxProps<Theme>,
 
   shell: {
@@ -23,8 +28,8 @@ export const loginSx = {
     borderRadius: 0, // ⚠️ en tu CSS dice "border-radius: px;" (está vacío). Lo dejo en 0 para no inventar.
     background: "#ffffff",
     border: "1px solid transparent",
-    backgroundImage:
-      "linear-gradient(#ffffff, #ffffff), linear-gradient(135deg, #0b3c7d, #0f4c97, #38bdf8, #7fe3b5)",
+    //backgroundImage:
+    //"linear-gradient(#ffffff, #ffffff), linear-gradient(135deg, #0b3c7d, #0f4c97, #38bdf8, #7fe3b5)",
     backgroundOrigin: "border-box",
     backgroundClip: "padding-box, border-box",
     boxShadow:

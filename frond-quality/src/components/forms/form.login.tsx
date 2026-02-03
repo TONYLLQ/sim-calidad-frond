@@ -21,6 +21,7 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 import { loginApi } from "../../api/auth";
 import { loginSx } from "../css/form.login.style.ts";
+import HeaderMigra from "../header/headerMigra";
 
 type LoginFormValues = {
   username: string;
@@ -83,6 +84,7 @@ export default function LoginForm({ onSuccess }: Props) {
 
   return (
     <Box sx={loginSx.container}>
+      <HeaderMigra />
       <Box sx={loginSx.shell}>
         <Paper elevation={0} sx={loginSx.paper}>
           {/* Header */}
@@ -92,7 +94,7 @@ export default function LoginForm({ onSuccess }: Props) {
             </Box>
 
             <Typography sx={loginSx.title} variant="h5">
-              Iniciar sesión
+              Bienvenido
             </Typography>
 
             <Typography sx={loginSx.subtitle} variant="body2">
