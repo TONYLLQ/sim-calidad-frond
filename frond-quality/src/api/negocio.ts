@@ -29,7 +29,15 @@ export type NegocioRow = {
   fecha_modificacion: string;
 };
 
+<<<<<<< HEAD
+export async function getNegocios(proceso?: number): Promise<NegocioRow[]> {
+  const { data } = await http.get<NegocioRow[]>("/api/business/business/");
+  if (proceso !== undefined) {
+    return data.filter((item) => item.proceso === proceso);
+  }
+=======
 export async function getNegocios(): Promise<NegocioRow[]> {
   const { data } = await http.get<NegocioRow[]>("/api/business/business/");
+>>>>>>> 6a31f3c (llopezq: commit 05)
   return data;
 }

@@ -72,6 +72,58 @@ export default function UsuariosPage() {
           minWidth: 0,
         }}
       >
+<<<<<<< HEAD
+        <Box
+          sx={{
+            width: "100%",
+            px: { xs: 1.5, md: 2 },
+            py: 3,
+            boxSizing: "border-box",
+
+            // ✅ CLAVE: deja que el grid inferior crezca
+            flex: 1,
+            minHeight: 0,
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+            minWidth: 0,
+          }}
+        >
+          <DataTable<NegocioRow>
+            title="CONTROL MIGRATORIO"
+            fetchData={() => getNegocios(1)}
+            pageSize={10}
+            idField="id"
+            columns={[
+              { key: "id", label: "ID", width: 80, noWrap: true },
+              { key: "nombre", label: "Nombre", width: 320 },
+
+              { key: "proceso_nombre", label: "Proceso", width: 220, noWrap: true },
+              {
+                key: "requerimiento_descripcion",
+                label: "Requerimiento",
+                width: 420,
+              },
+
+              { key: "regla_calidad_codigo", label: "Regla", width: 90, noWrap: true },
+              {
+                key: "regla_calidad_descripcion",
+                label: "Descripción Regla",
+                width: 420,
+              },
+
+              // ✅ Dimensión de calidad
+              {
+                key: "dimension_calidad_nombre",
+                label: "Dimensión Calidad",
+                width: 220,
+                noWrap: true,
+              },
+
+            ]}
+          />
+        </Box>
+=======
         <DataTable<NegocioRow>
       title="Negocios"
       fetchData={getNegocios}
@@ -105,6 +157,7 @@ export default function UsuariosPage() {
 
       ]}
     />
+>>>>>>> 6a31f3c (llopezq: commit 05)
       </Box>
     </Box>
   );
