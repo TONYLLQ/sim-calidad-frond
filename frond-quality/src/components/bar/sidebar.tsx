@@ -43,10 +43,10 @@ export type SidebarItem = {
 
 const MAIN_ITEMS: SidebarItem[] = [
   { label: "Dashboard", icon: <DashboardIcon />, to: "/dashboard" },
-  { label: "Analytics", icon: <BarChartIcon />, to: "/analytics" },
-  { label: "Users", icon: <PeopleIcon />, to: "/users", badge: 12 },
-  { label: "Reports", icon: <DescriptionIcon />, to: "/rules" },
-  { label: "Notifications", icon: <NotificationsIcon />, to: "/notifications", badge: 3 },
+  { label: "Control Migratorio", icon: <BarChartIcon />, to: "/control-migratorio" },
+  { label: "Emisión de Pasaporte", icon: <PeopleIcon />, to: "/emision-pasaporte", badge: 12 },
+  { label: "Nacionalización", icon: <DescriptionIcon />, to: "/nacionalizacion" },
+  { label: "Inmigración", icon: <NotificationsIcon />, to: "/inmigracion", badge: 3 },
 ];
 
 const BOTTOM_ITEMS: SidebarItem[] = [
@@ -118,7 +118,7 @@ export default function Sidebar({ collapsed, onToggle, onLogout, user }: Props) 
 
           {!collapsed && (
             <Typography fontWeight={900} letterSpacing={0.2}>
-              CALIDA DE DATOS
+             {/* aqui titulo */}
             </Typography>
           )}
         </Stack>
