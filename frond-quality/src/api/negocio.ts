@@ -29,7 +29,10 @@ export type NegocioRow = {
   fecha_modificacion: string;
 };
 
-export async function getNegocios(): Promise<NegocioRow[]> {
+export async function getNegocios(proceso?: number): Promise<NegocioRow[]> {
   const { data } = await http.get<NegocioRow[]>("/api/business/business/");
+  if (proceso !== undefined) {
+    return data.filter((item) => item.proceso === proceso);
+  }
   return data;
 }
