@@ -4,11 +4,9 @@ import Box from "@mui/material/Box";
 import Header from "../components/header/headermain";
 import Sidebar from "../components/bar/sidebar";
 import { getUsersApi } from "../api/user";
-<<<<<<< HEAD
 import DataTable from "../components/tables/table.tables";
 import { getNegocios, type NegocioRow } from "../api/negocio";
-=======
->>>>>>> 6a31f3c (llopezq: commit 05)
+import NegocioFormDialog from "../components/forms/NegocioFormDialog";
 
 const SIDEBAR_COLLAPSED = 72;
 const HEADER_H = 64;
@@ -16,6 +14,10 @@ const HEADER_H = 64;
 export default function UsuariosPage() {
   const [collapsed, setCollapsed] = React.useState(true);
   const [me, setMe] = React.useState<any>(null);
+
+  // ✅ Form State
+  const [formOpen, setFormOpen] = React.useState(false);
+  const [editingItem, setEditingItem] = React.useState<NegocioRow | undefined>(undefined);
 
   React.useEffect(() => {
     (async () => {
@@ -38,6 +40,20 @@ export default function UsuariosPage() {
     localStorage.removeItem("access_token");
     window.location.href = "/login";
   }, []);
+
+  const handleCreate = async (data: Partial<NegocioRow>) => {
+    console.log("Creando negocio:", data);
+    // Simular API call
+    await new Promise(r => setTimeout(r, 1000));
+    setFormOpen(false);
+  };
+
+  const handleUpdate = async (data: Partial<NegocioRow>) => {
+    console.log("Actualizando negocio:", data);
+    // Simular API call
+    await new Promise(r => setTimeout(r, 1000));
+    setFormOpen(false);
+  };
 
   const leftOffset = SIDEBAR_COLLAPSED;
 
@@ -76,7 +92,6 @@ export default function UsuariosPage() {
           minWidth: 0,
         }}
       >
-<<<<<<< HEAD
         <Box
           sx={{
             width: "100%",
@@ -93,11 +108,26 @@ export default function UsuariosPage() {
             minWidth: 0,
           }}
         >
+
           <DataTable<NegocioRow>
             title="Inmigración"
             fetchData={() => getNegocios(3)}
             pageSize={10}
             idField="id"
+            onAdd={() => {
+              setEditingItem(undefined);
+              setFormOpen(true);
+            }}
+            onEdit={(item) => {
+              setEditingItem(item);
+              setFormOpen(true);
+            }}
+            onDelete={async (item) => {
+              // TODO: Implementar llamada API real
+              console.log("Eliminar:", item);
+              await new Promise((resolve) => setTimeout(resolve, 1000));
+              console.log("Eliminado");
+            }}
             columns={[
               { key: "id", label: "ID", width: 80, noWrap: true },
               { key: "nombre", label: "Nombre", width: 320 },
@@ -116,6 +146,8 @@ export default function UsuariosPage() {
                 width: 420,
               },
 
+              { key: "script_nombre", label: "Script", width: 90, noWrap: true },
+
               // ✅ Dimensión de calidad
               {
                 key: "dimension_calidad_nombre",
@@ -127,10 +159,16 @@ export default function UsuariosPage() {
             ]}
           />
         </Box>
-=======
-INMIGRACION
->>>>>>> 6a31f3c (llopezq: commit 05)
       </Box>
+
+      {/* ✅ Formulario Modal */}
+      <NegocioFormDialog
+        open={formOpen}
+        onClose={() => setFormOpen(false)}
+        onSubmit={editingItem ? handleUpdate : handleCreate}
+        initialValues={editingItem || undefined}
+        procesoId={3}
+      />
     </Box>
   );
 }

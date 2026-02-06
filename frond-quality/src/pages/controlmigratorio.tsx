@@ -6,12 +6,18 @@ import Sidebar from "../components/bar/sidebar";
 import { getUsersApi } from "../api/user";
 import DataTable from "../components/tables/table.tables";
 import { getNegocios, type NegocioRow } from "../api/negocio";
+import NegocioFormDialog from "../components/forms/NegocioFormDialog";
+
 const SIDEBAR_COLLAPSED = 72;
 const HEADER_H = 64;
 
 export default function UsuariosPage() {
   const [collapsed, setCollapsed] = React.useState(true);
   const [me, setMe] = React.useState<any>(null);
+
+  // ✅ Form State
+  const [formOpen, setFormOpen] = React.useState(false);
+  const [editingItem, setEditingItem] = React.useState<NegocioRow | undefined>(undefined);
 
   React.useEffect(() => {
     (async () => {
@@ -34,6 +40,18 @@ export default function UsuariosPage() {
     localStorage.removeItem("access_token");
     window.location.href = "/login";
   }, []);
+
+  const handleCreate = async (data: Partial<NegocioRow>) => {
+    console.log("Creando negocio:", data);
+    await new Promise(r => setTimeout(r, 1000));
+    setFormOpen(false);
+  };
+
+  const handleUpdate = async (data: Partial<NegocioRow>) => {
+    console.log("Actualizando negocio:", data);
+    await new Promise(r => setTimeout(r, 1000));
+    setFormOpen(false);
+  };
 
   const leftOffset = SIDEBAR_COLLAPSED;
 
@@ -72,7 +90,6 @@ export default function UsuariosPage() {
           minWidth: 0,
         }}
       >
-<<<<<<< HEAD
         <Box
           sx={{
             width: "100%",
@@ -91,9 +108,26 @@ export default function UsuariosPage() {
         >
           <DataTable<NegocioRow>
             title="CONTROL MIGRATORIO"
-            fetchData={() => getNegocios(1)}
+            fetchData={() => getNegocios(1)
+              .then((data) => {
+                console.log(data);
+                return data;
+              })
+            }
             pageSize={10}
             idField="id"
+            onAdd={() => {
+              setEditingItem(undefined);
+              setFormOpen(true);
+            }}
+            onEdit={(item) => {
+              setEditingItem(item);
+              setFormOpen(true);
+            }}
+            onDelete={async (item) => {
+              console.log("Eliminar:", item);
+              await new Promise((resolve) => setTimeout(resolve, 1000));
+            }}
             columns={[
               { key: "id", label: "ID", width: 80, noWrap: true },
               { key: "nombre", label: "Nombre", width: 320 },
@@ -111,6 +145,8 @@ export default function UsuariosPage() {
                 label: "Descripción Regla",
                 width: 420,
               },
+              { key: "script_nombre", label: "Script", width: 90, noWrap: true },
+
 
               // ✅ Dimensión de calidad
               {
@@ -123,42 +159,16 @@ export default function UsuariosPage() {
             ]}
           />
         </Box>
-=======
-        <DataTable<NegocioRow>
-      title="Negocios"
-      fetchData={getNegocios}
-      pageSize={10}
-      idField="id"
-      columns={[
-       { key: "id", label: "ID", width: 80, noWrap: true },
-{ key: "nombre", label: "Nombre", width: 320 },
-
-{ key: "proceso_nombre", label: "Proceso", width: 220, noWrap: true },
-{
-  key: "requerimiento_descripcion",
-  label: "Requerimiento",
-  width: 420,
-},
-
-{ key: "regla_calidad_codigo", label: "Regla", width: 90, noWrap: true },
-{
-  key: "regla_calidad_descripcion",
-  label: "Descripción Regla",
-  width: 420,
-},
-
-// ✅ Dimensión de calidad
-{
-  key: "dimension_calidad_nombre",
-  label: "Dimensión Calidad",
-  width: 220,
-  noWrap: true,
-},
-
-      ]}
-    />
->>>>>>> 6a31f3c (llopezq: commit 05)
       </Box>
+
+      {/* ✅ Formulario Modal */}
+      <NegocioFormDialog
+        open={formOpen}
+        onClose={() => setFormOpen(false)}
+        onSubmit={editingItem ? handleUpdate : handleCreate}
+        initialValues={editingItem || undefined}
+        procesoId={1}
+      />
     </Box>
   );
 }

@@ -11,6 +11,6 @@ export type DimensionRow = {
 };
 
 export async function getDimension(): Promise<DimensionRow[]> {
-  const { data } = await http.get<DimensionRow[]>("/api/dimension-calidad/");
+  const { data } = await http.get<DimensionRow[]>("/api/rules/dimension-calidad/");
   return data;
 }
