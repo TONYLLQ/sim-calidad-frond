@@ -5,8 +5,8 @@ import Header from "../components/header/headermain";
 import Sidebar from "../components/bar/sidebar";
 import { getUsersApi } from "../api/user";
 import DataTable from "../components/tables/table.tables";
-import { getNegocios, type NegocioRow } from "../api/negocio";
-import NegocioFormDialog from "../components/forms/NegocioFormDialog";
+import { getNegocios, createNegocio, updateNegocio, deleteNegocio, type NegocioRow } from "../api/negocio";
+import NegocioFormDialog from "../components/forms/formAgregar";
 
 const SIDEBAR_COLLAPSED = 72;
 const HEADER_H = 64;
@@ -16,7 +16,7 @@ export default function UsuariosPage() {
   const [me, setMe] = React.useState<any>(null);
 
   // ✅ Form State
-  const [formOpen, setFormOpen] = React.useState(false);
+  // const [formOpen, setFormOpen] = React.useState(false);
   const [editingItem, setEditingItem] = React.useState<NegocioRow | undefined>(undefined);
 
   React.useEffect(() => {
@@ -42,15 +42,13 @@ export default function UsuariosPage() {
   }, []);
 
   const handleCreate = async (data: Partial<NegocioRow>) => {
-    console.log("Creando negocio:", data);
-    await new Promise(r => setTimeout(r, 1000));
-    setFormOpen(false);
+    await createNegocio(data);
   };
 
   const handleUpdate = async (data: Partial<NegocioRow>) => {
-    console.log("Actualizando negocio:", data);
-    await new Promise(r => setTimeout(r, 1000));
-    setFormOpen(false);
+    if (data.id) {
+      await updateNegocio(data.id, data);
+    }
   };
 
   const leftOffset = SIDEBAR_COLLAPSED;
@@ -108,38 +106,32 @@ export default function UsuariosPage() {
         >
           <DataTable<NegocioRow>
             title="CONTROL MIGRATORIO"
-            fetchData={() => getNegocios(1)
-              .then((data) => {
-                console.log(data);
-                return data;
-              })
-            }
+            fetchData={() => getNegocios(1)}
             pageSize={10}
             idField="id"
-            onAdd={() => {
-              setEditingItem(undefined);
-              setFormOpen(true);
-            }}
+            onCreate={handleCreate}
+            procesoId={1}
             onEdit={(item) => {
               setEditingItem(item);
-              setFormOpen(true);
             }}
+            onUpdate={handleUpdate}
             onDelete={async (item) => {
-              console.log("Eliminar:", item);
-              await new Promise((resolve) => setTimeout(resolve, 1000));
+              await deleteNegocio(item.id);
             }}
             columns={[
               { key: "id", label: "ID", width: 80, noWrap: true },
               { key: "nombre", label: "Nombre", width: 320 },
 
-              { key: "proceso_nombre", label: "Proceso", width: 220, noWrap: true },
+              { key: "escenario_nombre", label: "Escenario", width: 120, noWrap: true },
+
+              //{ key: "proceso_nombre", label: "Proceso", width: 220, noWrap: true },
               {
                 key: "requerimiento_descripcion",
                 label: "Requerimiento",
                 width: 420,
               },
 
-              { key: "regla_calidad_codigo", label: "Regla", width: 90, noWrap: true },
+              { key: "regla_calidad_codigo", label: "Regla", width: 120, noWrap: true },
               {
                 key: "regla_calidad_descripcion",
                 label: "Descripción Regla",
@@ -151,7 +143,7 @@ export default function UsuariosPage() {
               // ✅ Dimensión de calidad
               {
                 key: "dimension_calidad_nombre",
-                label: "Dimensión Calidad",
+                label: "Dimensión",
                 width: 220,
                 noWrap: true,
               },
@@ -160,15 +152,6 @@ export default function UsuariosPage() {
           />
         </Box>
       </Box>
-
-      {/* ✅ Formulario Modal */}
-      <NegocioFormDialog
-        open={formOpen}
-        onClose={() => setFormOpen(false)}
-        onSubmit={editingItem ? handleUpdate : handleCreate}
-        initialValues={editingItem || undefined}
-        procesoId={1}
-      />
     </Box>
   );
 }

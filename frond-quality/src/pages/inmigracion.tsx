@@ -5,8 +5,8 @@ import Header from "../components/header/headermain";
 import Sidebar from "../components/bar/sidebar";
 import { getUsersApi } from "../api/user";
 import DataTable from "../components/tables/table.tables";
-import { getNegocios, type NegocioRow } from "../api/negocio";
-import NegocioFormDialog from "../components/forms/NegocioFormDialog";
+import { getNegocios, createNegocio, updateNegocio, deleteNegocio, type NegocioRow } from "../api/negocio";
+import NegocioFormDialog from "../components/forms/formAgregar";
 
 const SIDEBAR_COLLAPSED = 72;
 const HEADER_H = 64;
@@ -42,16 +42,14 @@ export default function UsuariosPage() {
   }, []);
 
   const handleCreate = async (data: Partial<NegocioRow>) => {
-    console.log("Creando negocio:", data);
-    // Simular API call
-    await new Promise(r => setTimeout(r, 1000));
+    await createNegocio(data);
     setFormOpen(false);
   };
 
   const handleUpdate = async (data: Partial<NegocioRow>) => {
-    console.log("Actualizando negocio:", data);
-    // Simular API call
-    await new Promise(r => setTimeout(r, 1000));
+    if (data.id) {
+      await updateNegocio(data.id, data);
+    }
     setFormOpen(false);
   };
 
@@ -122,17 +120,17 @@ export default function UsuariosPage() {
               setEditingItem(item);
               setFormOpen(true);
             }}
+            onUpdate={handleUpdate}
             onDelete={async (item) => {
-              // TODO: Implementar llamada API real
-              console.log("Eliminar:", item);
-              await new Promise((resolve) => setTimeout(resolve, 1000));
-              console.log("Eliminado");
+              await deleteNegocio(item.id);
             }}
             columns={[
               { key: "id", label: "ID", width: 80, noWrap: true },
               { key: "nombre", label: "Nombre", width: 320 },
 
-              { key: "proceso_nombre", label: "Proceso", width: 220, noWrap: true },
+              { key: "escenario_nombre", label: "Escenario", width: 120, noWrap: true },
+
+              //{ key: "proceso_nombre", label: "Proceso", width: 220, noWrap: true },
               {
                 key: "requerimiento_descripcion",
                 label: "Requerimiento",
@@ -151,7 +149,7 @@ export default function UsuariosPage() {
               // ✅ Dimensión de calidad
               {
                 key: "dimension_calidad_nombre",
-                label: "Dimensión Calidad",
+                label: "Dimensión",
                 width: 220,
                 noWrap: true,
               },

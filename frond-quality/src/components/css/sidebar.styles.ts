@@ -6,31 +6,31 @@ export const DRAWER_COLLAPSED_WIDTH = 72;
 
 export const styles = {
   drawer: (drawerWidth: number) =>
-    ({
+  ({
+    width: drawerWidth,
+    flexShrink: 0,
+    "& .MuiDrawer-paper": {
       width: drawerWidth,
-      flexShrink: 0,
-      "& .MuiDrawer-paper": {
-        width: drawerWidth,
-        boxSizing: "border-box",
-        borderRight: "1px solid rgba(255,255,255,0.12)",
-        background: "linear-gradient(180deg, #0c3b75 0%, #0e4a8a 100%)",
-        color: "white",
-        overflowX: "hidden",
-        position: "fixed",
-            // ✅ AQUÍ: transición más lenta y suave
-        transition: "width 0.45s cubic-bezier(0.4, 0, 0.2, 1)",
-      },
-    } satisfies SxProps<Theme>),
+      boxSizing: "border-box",
+      borderRight: "1px solid rgba(255,255,255,0.12)",
+      background: "linear-gradient(180deg, #0c3b75 0%, #0e4a8a 100%)",
+      color: "white",
+      overflowX: "hidden",
+      position: "fixed",
+      // ✅ AQUÍ: transición más lenta y suave
+      transition: "width 0.45s cubic-bezier(0.4, 0, 0.2, 1)",
+    },
+  } satisfies SxProps<Theme>),
 
   header: (collapsed: boolean) =>
-    ({
-      height: 64,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: collapsed ? "center" : "space-between",
-      px: collapsed ? 0 : 2,
-      borderBottom: "1px solid rgba(255,255,255,0.12)",
-    } satisfies SxProps<Theme>),
+  ({
+    height: 64,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: collapsed ? "center" : "space-between",
+    px: collapsed ? 0 : 2,
+    borderBottom: "1px solid rgba(255,255,255,0.12)",
+  } satisfies SxProps<Theme>),
 
   logoBox: {
     width: 36,
@@ -140,24 +140,24 @@ export const styles = {
   } satisfies SxProps<Theme>,
 
   // ===== Items =====
-  itemButton: ( isActive: boolean) =>
-    ({
-      mx: 1,
-      my: 0.5,
-      borderRadius: 2,
-      minHeight: 44,
-      color: isActive ? "#0f4c97" : "rgba(255,255,255,0.92)",
-      backgroundColor: isActive ? "rgba(255,255,255,0.16)" : "transparent",
-      "&:hover": {
-        backgroundColor: "rgba(255,255,255,0.12)",
-      },
-    } satisfies SxProps<Theme>),
+  itemButton: (isActive: boolean) =>
+  ({
+    mx: 1,
+    my: 0.5,
+    borderRadius: 2,
+    minHeight: 44,
+    color: isActive ? "#ffffffff" : "rgba(255,255,255,0.92)",
+    backgroundColor: isActive ? "rgba(0, 153, 255, 0.16)" : "transparent",
+    "&:hover": {
+      backgroundColor: "rgba(255,255,255,0.12)",
+    },
+  } satisfies SxProps<Theme>),
 
   itemIcon: (collapsed: boolean, isActive: boolean) =>
-    ({
-      minWidth: 0,
-      mr: collapsed ? 0 : 1.5,
-      justifyContent: "center",
-      color: isActive ? "#0f4c97" : "rgba(255,255,255,0.85)",
-    } satisfies SxProps<Theme>),
+  ({
+    minWidth: 0,
+    mr: collapsed ? 0 : 1.5,
+    justifyContent: "center",
+    color: isActive ? "#ffffffff" : "rgba(255,255,255,0.85)",
+  } satisfies SxProps<Theme>),
 } as const;

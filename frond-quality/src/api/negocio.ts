@@ -36,3 +36,17 @@ export async function getNegocios(proceso?: number): Promise<NegocioRow[]> {
   }
   return data;
 }
+
+export async function createNegocio(negocio: Partial<NegocioRow>): Promise<NegocioRow> {
+  const { data } = await http.post<NegocioRow>("/api/business/business/", negocio);
+  return data;
+}
+
+export async function updateNegocio(id: number, negocio: Partial<NegocioRow>): Promise<NegocioRow> {
+  const { data } = await http.put<NegocioRow>(`/api/business/business/${id}/`, negocio);
+  return data;
+}
+
+export async function deleteNegocio(id: number): Promise<void> {
+  await http.delete(`/api/business/business/${id}/`);
+}
