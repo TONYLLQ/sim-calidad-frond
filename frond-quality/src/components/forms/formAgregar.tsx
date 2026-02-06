@@ -17,6 +17,7 @@ import { getProcesos, type Procesos } from "../../api/proceso";
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 import Box from '@mui/material/Box';
+import { getEscenario, type Escenario } from "../../api/escenario";
 
 export interface FormAgregarProps {
     open: boolean;
@@ -43,9 +44,11 @@ export default function FormAgregar({
     const [reglaId, setReglaId] = useState<number | "">("");
     const [requerimientoId, setRequerimientoId] = useState<number | "">("");
     const [selectedProcesoId, setSelectedProcesoId] = useState<number | "">("");
+    const [escenarioId, setEscenarioId] = useState<number | "">("");
 
     // Additional UI state
     const [reglaDescripcion, setReglaDescripcion] = useState("");
+    const [escenarioDescripcion, setEscenarioDescripcion] = useState("");
 
     useEffect(() => {
         if (open) {
@@ -61,6 +64,7 @@ export default function FormAgregar({
                 setSelectedProcesoId(initialValues.proceso || procesoId || "");
 
                 setReglaDescripcion(initialValues.regla_calidad_descripcion || "");
+                setEscenarioId(initialValues.escenario || "");
             } else {
                 setFormData({
                     nombre: "",
@@ -71,6 +75,7 @@ export default function FormAgregar({
                 setRequerimientoId("");
                 setSelectedProcesoId(procesoId || "");
                 setReglaDescripcion("");
+                setEscenarioId("");
             }
         }
     }, [open, initialValues, procesoId]);
@@ -97,6 +102,7 @@ export default function FormAgregar({
                 regla_calidad: Number(reglaId),
                 requerimiento: Number(requerimientoId),
                 proceso: Number(selectedProcesoId),
+                escenario: Number(escenarioId),
             };
             await onSubmit(dataToSubmit);
             onClose();
@@ -159,6 +165,44 @@ export default function FormAgregar({
                             error={submitted && !selectedProcesoId}
                         />
 
+                        {/* Escenario */}
+                        <Box
+                            sx={{ display: "flex", alignItems: "center", gap: 2, justifyContent: "space-between" }}>
+                            <Box sx={{ flexGrow: 1 }}>
+                                <ApiSelect<Escenario, number>
+                                    label="Escenario"
+                                    fetcher={getEscenario}
+                                    value={escenarioId}
+                                    onChangeValue={(val) => {
+                                        setEscenarioId(val);
+                                        handleChange("escenarios", val);
+                                    }}
+                                    onChangeItem={(item) => handleChange("escenario_codigo", item.codigo_escenario)}
+                                    getValue={(d) => d.id}
+                                    getLabel={(d) => d.codigo_escenario}
+                                    sort={(a, b) => a.codigo_escenario.localeCompare(b.codigo_escenario, "es")}
+                                    error={submitted && !escenarioId}
+                                />
+                            </Box>
+                            <Fab size="small" color="primary" aria-label="addRequerimiento" >
+                                <AddIcon />
+                            </Fab>
+                        </Box>
+
+                        {/* Descripción Escenario */}
+                        <TextField
+                            label="Descripción Escenario"
+                            fullWidth
+                            multiline
+                            rows={2}
+                            value={reglaDescripcion}
+                            InputProps={{
+                                readOnly: true,
+                                sx: { borderRadius: 2, bgcolor: "rgba(0,0,0,0.02)" }
+                            }}
+                        />
+
+
 
                         {/* Requerimiento */}
                         <Box
@@ -179,7 +223,7 @@ export default function FormAgregar({
                                     error={submitted && !requerimientoId}
                                 />
                             </Box>
-                            <Fab size="small" color="primary" aria-label="add" >
+                            <Fab size="small" color="primary" aria-label="addRequerimiento" >
                                 <AddIcon />
                             </Fab>
                         </Box>
@@ -207,14 +251,14 @@ export default function FormAgregar({
                                     error={submitted && !reglaId}
                                 />
                             </Box>
-                            <Fab size="small" color="primary" aria-label="add" >
+                            <Fab size="small" color="primary" aria-label="addRegla" >
                                 <AddIcon />
                             </Fab>
                         </Box>
 
                         {/* Descripción Regla */}
                         <TextField
-                            label="Descripción Regla"
+                            label="Descripción Escenario"
                             fullWidth
                             multiline
                             rows={2}
@@ -248,37 +292,29 @@ export default function FormAgregar({
                                     error={submitted && !scriptId}
                                 />
                             </Box>
-                            <Fab size="small" color="primary" aria-label="add" >
+                            <Fab size="small" color="primary" aria-label="addScript" >
                                 <AddIcon />
                             </Fab>
                         </Box>
 
 
                         {/* Dimensión*/}
-                        <Box
-                            sx={{ display: "flex", alignItems: "center", gap: 2, justifyContent: "space-between" }}>
-                            <Box sx={{ flexGrow: 1 }}>
+                        <ApiSelect<DimensionRow, number>
+                            label="Dimensión Calidad"
+                            fetcher={getDimension}
+                            value={dimensionId}
+                            onChangeValue={(val) => {
+                                setDimensionId(val);
+                                handleChange("dimension_calidad_id", val);
+                            }}
+                            onChangeItem={(item) => handleChange("dimension_calidad_nombre", item.nombre)}
+                            getValue={(d) => d.id}
+                            getLabel={(d) => d.nombre}
+                            filter={(d) => d.b_activo}
+                            sort={(a, b) => a.nombre.localeCompare(b.nombre, "es")}
+                            error={submitted && !dimensionId}
+                        />
 
-                                <ApiSelect<DimensionRow, number>
-                                    label="Dimensión Calidad"
-                                    fetcher={getDimension}
-                                    value={dimensionId}
-                                    onChangeValue={(val) => {
-                                        setDimensionId(val);
-                                        handleChange("dimension_calidad_id", val);
-                                    }}
-                                    onChangeItem={(item) => handleChange("dimension_calidad_nombre", item.nombre)}
-                                    getValue={(d) => d.id}
-                                    getLabel={(d) => d.nombre}
-                                    filter={(d) => d.b_activo}
-                                    sort={(a, b) => a.nombre.localeCompare(b.nombre, "es")}
-                                    error={submitted && !dimensionId}
-                                />
-                            </Box>
-                            <Fab size="small" color="primary" aria-label="add" >
-                                <AddIcon />
-                            </Fab>
-                        </Box>
 
 
                     </Stack>

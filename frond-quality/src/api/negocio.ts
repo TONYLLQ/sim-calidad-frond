@@ -22,6 +22,7 @@ export type NegocioRow = {
   dimension_calidad_nombre: string;
 
   escenario_nombre: string;
+  escenario_descripcion: string;
   script_nombre: string;
 
   // ===== Auditoría =====

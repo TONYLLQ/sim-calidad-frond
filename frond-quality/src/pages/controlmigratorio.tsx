@@ -124,6 +124,8 @@ export default function UsuariosPage() {
 
               { key: "escenario_nombre", label: "Escenario", width: 120, noWrap: true },
 
+              { key: "escenario_descripcion", label: "Descripción Escenario", width: 420 },
+
               //{ key: "proceso_nombre", label: "Proceso", width: 220, noWrap: true },
               {
                 key: "requerimiento_descripcion",
