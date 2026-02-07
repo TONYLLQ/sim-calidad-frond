@@ -4,11 +4,8 @@ import Box from "@mui/material/Box";
 import Header from "../components/header/headermain";
 import Sidebar from "../components/bar/sidebar";
 import { getUsersApi } from "../api/user";
-<<<<<<< HEAD
 import DataTable from "../components/tables/table.tables";
 import { getNegocios, type NegocioRow } from "../api/negocio";
-=======
->>>>>>> 6a31f3c (llopezq: commit 05)
 
 const SIDEBAR_COLLAPSED = 72;
 const HEADER_H = 64;
@@ -76,7 +73,6 @@ export default function UsuariosPage() {
           minWidth: 0,
         }}
       >
-<<<<<<< HEAD
         <Box
           sx={{
             width: "100%",
@@ -127,9 +123,6 @@ export default function UsuariosPage() {
             ]}
           />
         </Box>
-=======
-INMIGRACION
->>>>>>> 6a31f3c (llopezq: commit 05)
       </Box>
     </Box>
   );

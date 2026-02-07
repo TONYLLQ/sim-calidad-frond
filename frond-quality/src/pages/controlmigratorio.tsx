@@ -72,7 +72,6 @@ export default function UsuariosPage() {
           minWidth: 0,
         }}
       >
-<<<<<<< HEAD
         <Box
           sx={{
             width: "100%",
@@ -123,41 +122,6 @@ export default function UsuariosPage() {
             ]}
           />
         </Box>
-=======
-        <DataTable<NegocioRow>
-      title="Negocios"
-      fetchData={getNegocios}
-      pageSize={10}
-      idField="id"
-      columns={[
-       { key: "id", label: "ID", width: 80, noWrap: true },
-{ key: "nombre", label: "Nombre", width: 320 },
-
-{ key: "proceso_nombre", label: "Proceso", width: 220, noWrap: true },
-{
-  key: "requerimiento_descripcion",
-  label: "Requerimiento",
-  width: 420,
-},
-
-{ key: "regla_calidad_codigo", label: "Regla", width: 90, noWrap: true },
-{
-  key: "regla_calidad_descripcion",
-  label: "Descripción Regla",
-  width: 420,
-},
-
-// ✅ Dimensión de calidad
-{
-  key: "dimension_calidad_nombre",
-  label: "Dimensión Calidad",
-  width: 220,
-  noWrap: true,
-},
-
-      ]}
-    />
->>>>>>> 6a31f3c (llopezq: commit 05)
       </Box>
     </Box>
   );
