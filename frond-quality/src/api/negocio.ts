@@ -22,6 +22,7 @@ export type NegocioRow = {
   dimension_calidad_nombre: string;
 
   escenario_nombre: string;
+  escenario_descripcion: string;
   script_nombre: string;
 
   // ===== Auditoría =====
@@ -29,15 +30,24 @@ export type NegocioRow = {
   fecha_modificacion: string;
 };
 
-<<<<<<< HEAD
 export async function getNegocios(proceso?: number): Promise<NegocioRow[]> {
   const { data } = await http.get<NegocioRow[]>("/api/business/business/");
   if (proceso !== undefined) {
     return data.filter((item) => item.proceso === proceso);
   }
-=======
-export async function getNegocios(): Promise<NegocioRow[]> {
-  const { data } = await http.get<NegocioRow[]>("/api/business/business/");
->>>>>>> 6a31f3c (llopezq: commit 05)
   return data;
+}
+
+export async function createNegocio(negocio: Partial<NegocioRow>): Promise<NegocioRow> {
+  const { data } = await http.post<NegocioRow>("/api/business/business/", negocio);
+  return data;
+}
+
+export async function updateNegocio(id: number, negocio: Partial<NegocioRow>): Promise<NegocioRow> {
+  const { data } = await http.put<NegocioRow>(`/api/business/business/${id}/`, negocio);
+  return data;
+}
+
+export async function deleteNegocio(id: number): Promise<void> {
+  await http.delete(`/api/business/business/${id}/`);
 }

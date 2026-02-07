@@ -17,6 +17,20 @@ import TableBody from "@mui/material/TableBody";
 import Tooltip from "@mui/material/Tooltip";
 import Divider from "@mui/material/Divider";
 
+// ✅ Dialog imports
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogActions from "@mui/material/DialogActions";
+
+import FormEdicion from "../forms/formEdicion";
+import FormAgregar from "../forms/formAgregar";
+
+import { getEstadoEscenario, type EstadoEscenario } from "../../api/estadoescenario";
+import ApiSelect from "../ui/dimensionselect";
+
+
 import {
   Loader2,
   Trash2,
@@ -25,6 +39,7 @@ import {
   ChevronLeft,
   ChevronRight,
   RefreshCw,
+  Pencil,
 } from "lucide-react";
 
 export interface Column<T> {
@@ -45,11 +60,15 @@ export interface DataTableProps<T> {
   title?: string;
 
   onAdd?: () => void;
+  onCreate?: (item: Partial<T>) => Promise<void>;
+  onEdit?: (item: T) => void;
+  onUpdate?: (item: T) => Promise<void>; // New prop for update
   onDelete?: (item: T) => Promise<void>;
   onRefresh?: () => void;
 
   pageSize?: number;
   idField?: keyof T;
+  procesoId?: number;
 }
 
 export default function DataTable<T>({
@@ -57,10 +76,14 @@ export default function DataTable<T>({
   fetchData,
   title = "Registros",
   onAdd,
+  onCreate,
+  onEdit,
+  onUpdate,
   onDelete,
   onRefresh,
   pageSize = 10,
   idField = "id" as keyof T,
+  procesoId,
 }: DataTableProps<T>) {
   const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState(true);
@@ -70,6 +93,14 @@ export default function DataTable<T>({
   const [currentPage, setCurrentPage] = useState(1);
 
   const [deletingId, setDeletingId] = useState<string | number | null>(null);
+
+  // ✅ Estado para el modal de confirmación
+  const [deleteConfirmation, setDeleteConfirmation] = useState<T | null>(null);
+  const [editModalItem, setEditModalItem] = useState<T | null>(null);
+  const [addModalOpen, setAddModalOpen] = useState(false);
+
+  // New state for filtering
+  const [escenarioId, setEscenarioId] = useState<number | "">("");
 
   const load = useCallback(async () => {
     try {
@@ -90,11 +121,14 @@ export default function DataTable<T>({
     load();
   }, [load]);
 
-  const handleDelete = async (item: T) => {
-    if (!onDelete) return;
+  // Esta función ejecuta el borrado real
+  const executeDelete = async () => {
+    if (!onDelete || !deleteConfirmation) return;
+    const item = deleteConfirmation;
     const itemId = (item as any)[idField] as any;
 
     try {
+      setDeleteConfirmation(null); // Cerrar modal antes de iniciar (mostramos loading en la fila)
       setDeletingId(itemId);
       await onDelete(item);
 
@@ -114,17 +148,23 @@ export default function DataTable<T>({
 
   // ========= FILTRADO =========
   const filteredData = useMemo(() => {
-    const term = searchTerm.trim().toLowerCase();
-    if (!term) return data;
+    return data.filter((item) => {
+      // 1. Filter by Escenario ID (if set)
+      if (escenarioId !== "" && (item as any).escenarios !== escenarioId) {
+        return false;
+      }
 
-    return data.filter((item) =>
-      columns.some((col) => {
+      // 2. Filter by Search Term
+      const term = searchTerm.trim().toLowerCase();
+      if (!term) return true;
+
+      return columns.some((col) => {
         const value = (item as any)[col.key];
         if (value === null || value === undefined) return false;
         return String(value).toLowerCase().includes(term);
-      })
-    );
-  }, [data, columns, searchTerm]);
+      });
+    });
+  }, [data, columns, searchTerm, escenarioId]);
 
   // ========= PAGINACIÓN =========
   const totalPages = Math.max(1, Math.ceil(filteredData.length / pageSize));
@@ -170,10 +210,10 @@ export default function DataTable<T>({
           </Box>
 
           <Stack direction="row" spacing={1} alignItems="center">
-            {onAdd && (
+            {(onAdd || onCreate) && (
               <Button
                 variant="contained"
-                onClick={onAdd}
+                onClick={onCreate ? () => setAddModalOpen(true) : onAdd}
                 startIcon={<Plus size={16} />}
                 sx={{ borderRadius: 2, textTransform: "none", fontWeight: 800 }}
               >
@@ -192,24 +232,44 @@ export default function DataTable<T>({
           </Stack>
         </Stack>
 
-        {/* ===== Search ===== */}
-        <TextField
-          fullWidth
-          size="small"
-          placeholder="Buscar en registros..."
-          value={searchTerm}
-          onChange={(e) => {
-            setSearchTerm(e.target.value);
-            setCurrentPage(1);
-          }}
-          InputProps={{
-            startAdornment: (
-              <Box sx={{ display: "flex", alignItems: "center", mr: 1, opacity: 0.65 }}>
-                <Search size={16} />
-              </Box>
-            ),
-          }}
-        />
+        {/* ===== Search & Filter ===== */}
+        <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
+          <TextField
+            fullWidth
+            size="small"
+            placeholder="Buscar en registros..."
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }}
+            InputProps={{
+              startAdornment: (
+                <Box sx={{ display: "flex", alignItems: "center", mr: 1, opacity: 0.65 }}>
+                  <Search size={16} />
+                </Box>
+              ),
+            }}
+          />
+
+          <Box sx={{ minWidth: 240 }}>
+            <ApiSelect<EstadoEscenario, number>
+              label="Status Escenario"
+              placeholder="Todos"
+              fetcher={getEstadoEscenario}
+              value={escenarioId}
+              onChangeValue={(val) => {
+                setEscenarioId(val);
+                setCurrentPage(1);
+              }}
+              getValue={(d) => d.id}
+              getLabel={(d) => d.nombre}
+              filter={(d) => d.b_activo}
+              sort={(a, b) => a.nombre.localeCompare(b.nombre, "es")}
+              fullWidth
+            />
+          </Box>
+        </Stack>
 
         {/* ===== Error ===== */}
         {error && (
@@ -250,8 +310,8 @@ export default function DataTable<T>({
                       {col.label}
                     </TableCell>
                   ))}
-                  {onDelete && (
-                    <TableCell sx={{ fontWeight: 800, width: 80, whiteSpace: "nowrap" }}>
+                  {(onDelete || onEdit) && (
+                    <TableCell sx={{ fontWeight: 800, width: 100, whiteSpace: "nowrap", textAlign: "right" }}>
                       Acción
                     </TableCell>
                   )}
@@ -262,7 +322,7 @@ export default function DataTable<T>({
                 {paginatedData.length === 0 ? (
                   <TableRow>
                     <TableCell
-                      colSpan={columns.length + (onDelete ? 1 : 0)}
+                      colSpan={columns.length + (onDelete || onEdit ? 1 : 0)}
                       sx={{ py: 6, textAlign: "center", color: "text.secondary" }}
                     >
                       No hay registros para mostrar
@@ -300,27 +360,45 @@ export default function DataTable<T>({
                           );
                         })}
 
-                        {onDelete && (
-                          <TableCell>
-                            <Tooltip title="Eliminar">
-                              <span>
-                                <IconButton
-                                  onClick={() => handleDelete(item)}
-                                  disabled={deletingId === itemId}
-                                  size="small"
-                                  sx={{
-                                    borderRadius: 2,
-                                    "&:hover": { background: "rgba(211,47,47,0.08)" },
-                                  }}
-                                >
-                                  {deletingId === itemId ? (
-                                    <CircularProgress size={16} />
-                                  ) : (
-                                    <Trash2 size={16} />
-                                  )}
-                                </IconButton>
-                              </span>
-                            </Tooltip>
+                        {(onDelete || onEdit) && (
+                          <TableCell sx={{ textAlign: "right" }}>
+                            <Stack direction="row" spacing={1} justifyContent="flex-end">
+                              {onEdit && (
+                                <Tooltip title="Editar">
+                                  <IconButton
+                                    onClick={() => setEditModalItem(item)}
+                                    size="small"
+                                    sx={{
+                                      borderRadius: 2,
+                                      color: "primary.main",
+                                      "&:hover": { background: "rgba(25, 118, 210, 0.08)" },
+                                    }}
+                                  >
+                                    <Pencil size={16} />
+                                  </IconButton>
+                                </Tooltip>
+                              )}
+                              {onDelete && (
+                                <Tooltip title="Eliminar">
+                                  <IconButton
+                                    onClick={() => setDeleteConfirmation(item)}
+                                    disabled={deletingId === itemId}
+                                    size="small"
+                                    sx={{
+                                      borderRadius: 2,
+                                      color: "error.main",
+                                      "&:hover": { background: "rgba(211,47,47,0.08)" },
+                                    }}
+                                  >
+                                    {deletingId === itemId ? (
+                                      <CircularProgress size={16} />
+                                    ) : (
+                                      <Trash2 size={16} />
+                                    )}
+                                  </IconButton>
+                                </Tooltip>
+                              )}
+                            </Stack>
                           </TableCell>
                         )}
                       </TableRow>
@@ -366,6 +444,72 @@ export default function DataTable<T>({
         )}
 
         <Divider sx={{ opacity: 0.4 }} />
+
+        {/* ===== Confirm Delete Dialog ===== */}
+        <Dialog
+          open={!!deleteConfirmation}
+          onClose={() => setDeleteConfirmation(null)}
+          PaperProps={{
+            sx: { borderRadius: 3, padding: 1, minWidth: 320 },
+          }}
+        >
+          <DialogTitle sx={{ fontWeight: 800 }}>Confirmar eliminación</DialogTitle>
+          <DialogContent>
+            <DialogContentText color="text.primary">
+              ¿Estás seguro de que deseas eliminar este registro?
+              <br />
+              Esta acción no se puede deshacer.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => setDeleteConfirmation(null)}
+              sx={{ textTransform: "none", fontWeight: 700 }}
+              color="inherit"
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={executeDelete}
+              variant="contained"
+              color="error"
+              sx={{ borderRadius: 2, textTransform: "none", fontWeight: 800, boxShadow: 'none' }}
+              autoFocus
+            >
+              Eliminar
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* ✅ Edit Dialog (Local) */}
+        {editModalItem && (
+          <FormEdicion
+            open={!!editModalItem}
+            onClose={() => setEditModalItem(null)}
+            initialValues={editModalItem as any}
+            onSubmit={async (values) => {
+              if (onUpdate) {
+                await onUpdate(values as any);
+              }
+              setEditModalItem(null);
+              load();
+            }}
+          />
+        )}
+
+        {/* ✅ Add Dialog (Local) */}
+        {addModalOpen && onCreate && (
+          <FormAgregar
+            open={addModalOpen}
+            onClose={() => setAddModalOpen(false)}
+            onSubmit={async (values) => {
+              await onCreate(values as any);
+              setAddModalOpen(false);
+              load();
+            }}
+            procesoId={procesoId}
+          />
+        )}
       </Stack>
     </Box>
   );

@@ -4,11 +4,9 @@ import Box from "@mui/material/Box";
 import Header from "../components/header/headermain";
 import Sidebar from "../components/bar/sidebar";
 import { getUsersApi } from "../api/user";
-<<<<<<< HEAD
 import DataTable from "../components/tables/table.tables";
-import { getNegocios, type NegocioRow } from "../api/negocio";
-=======
->>>>>>> 6a31f3c (llopezq: commit 05)
+import { getNegocios, createNegocio, updateNegocio, deleteNegocio, type NegocioRow } from "../api/negocio";
+import NegocioFormDialog from "../components/forms/formAgregar";
 
 const SIDEBAR_COLLAPSED = 72;
 const HEADER_H = 64;
@@ -16,6 +14,10 @@ const HEADER_H = 64;
 export default function UsuariosPage() {
   const [collapsed, setCollapsed] = React.useState(true);
   const [me, setMe] = React.useState<any>(null);
+
+  // ✅ Form State
+  const [formOpen, setFormOpen] = React.useState(false);
+  const [editingItem, setEditingItem] = React.useState<NegocioRow | undefined>(undefined);
 
   React.useEffect(() => {
     (async () => {
@@ -38,6 +40,18 @@ export default function UsuariosPage() {
     localStorage.removeItem("access_token");
     window.location.href = "/login";
   }, []);
+
+  const handleCreate = async (data: Partial<NegocioRow>) => {
+    await createNegocio(data);
+    setFormOpen(false);
+  };
+
+  const handleUpdate = async (data: Partial<NegocioRow>) => {
+    if (data.id) {
+      await updateNegocio(data.id, data);
+    }
+    setFormOpen(false);
+  };
 
   const leftOffset = SIDEBAR_COLLAPSED;
 
@@ -76,7 +90,6 @@ export default function UsuariosPage() {
           minWidth: 0,
         }}
       >
-<<<<<<< HEAD
         <Box
           sx={{
             width: "100%",
@@ -93,16 +106,31 @@ export default function UsuariosPage() {
             minWidth: 0,
           }}
         >
+
           <DataTable<NegocioRow>
             title="Nacionalización"
             fetchData={() => getNegocios(4)}
             pageSize={10}
             idField="id"
+            onAdd={() => {
+              setEditingItem(undefined);
+              setFormOpen(true);
+            }}
+            onEdit={(item) => {
+              setEditingItem(item);
+              setFormOpen(true);
+            }}
+            onUpdate={handleUpdate}
+            onDelete={async (item) => {
+              await deleteNegocio(item.id);
+            }}
             columns={[
               { key: "id", label: "ID", width: 80, noWrap: true },
               { key: "nombre", label: "Nombre", width: 320 },
 
-              { key: "proceso_nombre", label: "Proceso", width: 220, noWrap: true },
+              { key: "escenario_nombre", label: "Escenario", width: 120, noWrap: true },
+
+              //{ key: "proceso_nombre", label: "Proceso", width: 220, noWrap: true },
               {
                 key: "requerimiento_descripcion",
                 label: "Requerimiento",
@@ -116,10 +144,12 @@ export default function UsuariosPage() {
                 width: 420,
               },
 
+              { key: "script_nombre", label: "Script", width: 90, noWrap: true },
+
               // ✅ Dimensión de calidad
               {
                 key: "dimension_calidad_nombre",
-                label: "Dimensión Calidad",
+                label: "Dimensión",
                 width: 220,
                 noWrap: true,
               },
@@ -127,11 +157,16 @@ export default function UsuariosPage() {
             ]}
           />
         </Box>
-=======
-NACIONALIZACION
-
->>>>>>> 6a31f3c (llopezq: commit 05)
       </Box>
+
+      {/* ✅ Formulario Modal */}
+      <NegocioFormDialog
+        open={formOpen}
+        onClose={() => setFormOpen(false)}
+        onSubmit={editingItem ? handleUpdate : handleCreate}
+        initialValues={editingItem || undefined}
+        procesoId={4}
+      />
     </Box>
   );
 }

@@ -71,8 +71,8 @@ export default function ApiSelect<T, V extends string | number>({
       const err = e as { response?: { data?: ApiError } };
       setApiError(
         err.response?.data?.detail ||
-          err.response?.data?.message ||
-          "No se pudo cargar opciones."
+        err.response?.data?.message ||
+        "No se pudo cargar opciones."
       );
       setItems([]);
     } finally {
@@ -95,19 +95,20 @@ export default function ApiSelect<T, V extends string | number>({
       <TextField
         select
         label={label}
-        value={value}
+        value={value === "" ? "" : String(value)}
         onChange={(e) => {
           const raw = e.target.value;
 
-          // MUI devuelve string siempre, convertimos:
-          const selectedValue = (typeof value === "number"
-            ? Number(raw)
-            : String(raw)) as V;
+          if (raw === "") {
+            onChangeValue("" as any);
+            return;
+          }
 
-          onChangeValue(selectedValue);
-
-          const found = items.find((it) => getValue(it) === selectedValue);
-          if (found && onChangeItem) onChangeItem(found);
+          const found = items.find((it) => String(getValue(it)) === raw);
+          if (found) {
+            onChangeValue(getValue(found));
+            if (onChangeItem) onChangeItem(found);
+          }
         }}
         disabled={disabled || loading}
         error={error}

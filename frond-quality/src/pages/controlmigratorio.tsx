@@ -5,13 +5,19 @@ import Header from "../components/header/headermain";
 import Sidebar from "../components/bar/sidebar";
 import { getUsersApi } from "../api/user";
 import DataTable from "../components/tables/table.tables";
-import { getNegocios, type NegocioRow } from "../api/negocio";
+import { getNegocios, createNegocio, updateNegocio, deleteNegocio, type NegocioRow } from "../api/negocio";
+import NegocioFormDialog from "../components/forms/formAgregar";
+
 const SIDEBAR_COLLAPSED = 72;
 const HEADER_H = 64;
 
 export default function UsuariosPage() {
   const [collapsed, setCollapsed] = React.useState(true);
   const [me, setMe] = React.useState<any>(null);
+
+  // ✅ Form State
+  // const [formOpen, setFormOpen] = React.useState(false);
+  const [editingItem, setEditingItem] = React.useState<NegocioRow | undefined>(undefined);
 
   React.useEffect(() => {
     (async () => {
@@ -34,6 +40,16 @@ export default function UsuariosPage() {
     localStorage.removeItem("access_token");
     window.location.href = "/login";
   }, []);
+
+  const handleCreate = async (data: Partial<NegocioRow>) => {
+    await createNegocio(data);
+  };
+
+  const handleUpdate = async (data: Partial<NegocioRow>) => {
+    if (data.id) {
+      await updateNegocio(data.id, data);
+    }
+  };
 
   const leftOffset = SIDEBAR_COLLAPSED;
 
@@ -72,7 +88,6 @@ export default function UsuariosPage() {
           minWidth: 0,
         }}
       >
-<<<<<<< HEAD
         <Box
           sx={{
             width: "100%",
@@ -94,28 +109,43 @@ export default function UsuariosPage() {
             fetchData={() => getNegocios(1)}
             pageSize={10}
             idField="id"
+            onCreate={handleCreate}
+            procesoId={1}
+            onEdit={(item) => {
+              setEditingItem(item);
+            }}
+            onUpdate={handleUpdate}
+            onDelete={async (item) => {
+              await deleteNegocio(item.id);
+            }}
             columns={[
               { key: "id", label: "ID", width: 80, noWrap: true },
               { key: "nombre", label: "Nombre", width: 320 },
 
-              { key: "proceso_nombre", label: "Proceso", width: 220, noWrap: true },
+              { key: "escenario_nombre", label: "Escenario", width: 120, noWrap: true },
+
+              { key: "escenario_descripcion", label: "Descripción Escenario", width: 420 },
+
+              //{ key: "proceso_nombre", label: "Proceso", width: 220, noWrap: true },
               {
                 key: "requerimiento_descripcion",
                 label: "Requerimiento",
                 width: 420,
               },
 
-              { key: "regla_calidad_codigo", label: "Regla", width: 90, noWrap: true },
+              { key: "regla_calidad_codigo", label: "Regla", width: 120, noWrap: true },
               {
                 key: "regla_calidad_descripcion",
                 label: "Descripción Regla",
                 width: 420,
               },
+              { key: "script_nombre", label: "Script", width: 90, noWrap: true },
+
 
               // ✅ Dimensión de calidad
               {
                 key: "dimension_calidad_nombre",
-                label: "Dimensión Calidad",
+                label: "Dimensión",
                 width: 220,
                 noWrap: true,
               },
@@ -123,41 +153,6 @@ export default function UsuariosPage() {
             ]}
           />
         </Box>
-=======
-        <DataTable<NegocioRow>
-      title="Negocios"
-      fetchData={getNegocios}
-      pageSize={10}
-      idField="id"
-      columns={[
-       { key: "id", label: "ID", width: 80, noWrap: true },
-{ key: "nombre", label: "Nombre", width: 320 },
-
-{ key: "proceso_nombre", label: "Proceso", width: 220, noWrap: true },
-{
-  key: "requerimiento_descripcion",
-  label: "Requerimiento",
-  width: 420,
-},
-
-{ key: "regla_calidad_codigo", label: "Regla", width: 90, noWrap: true },
-{
-  key: "regla_calidad_descripcion",
-  label: "Descripción Regla",
-  width: 420,
-},
-
-// ✅ Dimensión de calidad
-{
-  key: "dimension_calidad_nombre",
-  label: "Dimensión Calidad",
-  width: 220,
-  noWrap: true,
-},
-
-      ]}
-    />
->>>>>>> 6a31f3c (llopezq: commit 05)
       </Box>
     </Box>
   );
